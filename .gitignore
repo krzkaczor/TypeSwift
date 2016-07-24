@@ -1,0 +1,6 @@
+.idea
+dist
+example/node_modules
+example/typings
+node_modules
+typings

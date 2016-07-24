@@ -1,0 +1,31 @@
+{
+  "name": "TypeSwift",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/krzkaczor/TypeSwift.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/krzkaczor/TypeSwift/issues"
+  },
+  "homepage": "https://github.com/krzkaczor/TypeSwift#readme",
+  "devDependencies": {
+    "typescript": "1.8.10"
+  },
+  "dependencies": {
+    "fs-extra": "0.30.0",
+    "lodash": "4.13.1"
+  }
+}
