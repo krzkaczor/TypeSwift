@@ -1,8 +1,13 @@
 import * as ts from "typescript";
 import * as _ from "lodash"
+import * as fs from "fs";
 
 export class SwiftFile {
   constructor(public name: string, public code: string) {}
+
+  static fromFile(name: string, path: string): SwiftFile {
+    return new SwiftFile(name, fs.readFileSync(path).toString())
+  }
 }
 
 export default class SwiftDefinitionGenerator {
@@ -35,30 +40,7 @@ export default class SwiftDefinitionGenerator {
   }
 
   emitSwiftFiles(): Array<SwiftFile> {
-    const ExampleContext = `import Foundation
-import JavaScriptCore
-
-struct ExampleContext {
-    static var once = dispatch_once_t()
-
-    private static let _defaultContext = JSContext()
-    
-    static let defaultContext = {
-        () -> JSContext in
-        dispatch_once(&once) {           
-            ExampleContext._defaultContext.exceptionHandler = { context, exception in
-                print("JS Error: \(exception)")
-            }
-            
-            let fileURL = NSBundle.mainBundle().URLForResource("bundle", withExtension: "js")
-            let bundle = try! String(contentsOfURL: fileURL!, encoding: NSUTF8StringEncoding)
-            
-            ExampleContext._defaultContext.evaluateScript(bundle)
-        }
-        return ExampleContext._defaultContext
-    }
-}`;
-
+    let sharedContext = SwiftFile.fromFile('SharedContext', './runtime/SharedContext.swift')
 
     let codeChunks = `import JavaScriptCore\n`
 
@@ -70,7 +52,7 @@ struct ExampleContext {
     }).join('\n')
 
     return [
-      new SwiftFile('ExampleContext', ExampleContext),
+      sharedContext,
       new SwiftFile('Bundle', codeChunks)
     ]
   }
@@ -90,9 +72,9 @@ function emitFunctionProxy(functionDeclaration: ts.FunctionDeclaration): string 
   const name = functionDeclaration.name.text
 
   return `public func ${name}(${parameters.map(p => `${p[0]}: ${p[1]}?`).join(', ')}) -> ${resultType}? {
-    let fn = ExampleContext.defaultContext().objectForKeyedSubscript("${name}")
+    let fn = SharedContext.defaultContext().objectForKeyedSubscript("${name}")
     
-    let result = fn.callWithArguments([(${parameters.map(p => `${p[0]} ?? JSValue.init(nullInContext: ExampleContext.defaultContext()`).join(', ')}))!])
+    let result = fn.callWithArguments([(${parameters.map(p => `${p[0]} ?? JSValue.init(nullInContext: SharedContext.defaultContext()`).join(', ')}))!])
     
     if result.isUndefined || result.isNull {
         return nil
