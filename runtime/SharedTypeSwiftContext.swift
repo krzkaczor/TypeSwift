@@ -6,7 +6,7 @@ struct SharedTypeSwiftContext {
     let context = JSContext()
 
     private init() {
-        SharedTypeSwiftContext._defaultContext.exceptionHandler = { context, exception in
+        self.context.exceptionHandler = { context, exception in
             print("JS Error: \(exception)")
         }
 
