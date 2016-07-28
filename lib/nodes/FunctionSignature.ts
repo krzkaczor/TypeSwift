@@ -17,7 +17,7 @@ public func ${this.name}(${this.parameters.map(p => p.emitSwift()).join(', ')}) 
     return nil
   }
 
-  return ${this.resultType.emitSwift()}(result.toInt32())
-}` //@todo toInt32
+  return ${this.resultType.conversionFromJsCore('result')}
+}`
   }
 }
